@@ -3,16 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TrajTracker's Off-the-shelf paradigms
-=====================================
+TrajTracker paradigms
+=====================
 
-TrajTracker also offers ready-to-use experimental paradigms: sets of functions that allow
-creating your own experiment with almost no programming:
+TrajTracker offers two ready-to-use experimental paradigms - number-to-position mapping and discrete-choice
+(two buttons forced choice). Each of them is a set of functions that allow
+creating your own experiment with almost no programming.
 
-Example scripts with these paradigms are provided as part of the TrajTracker distribution,
-under `samples/paradigms <http://github.com/trajtracker/trajtracker/tree/master/samples/paradigms>`_.
-
-You can create your own number-to-position experiment in two ways:
+For each of the two paradigms, you can create your own experiment in two ways:
 
 * For most common features, you will only have to change the program configuration.
 
@@ -106,6 +104,48 @@ The simplest way to do such modifications is to copy the relevant functions into
 You can see an example for the way it is done in the
 `number_to_position_2 <https://github.com/trajtracker/trajtracker/tree/master/samples/number_to_position_2>`_
 sample script.
+
+Events
+++++++
+
+*TrajTracker Paradigms* works with events, which help you run your custom code at predefined times.
+To learn how to plug your code to run when specific events occur, please read the
+`events <http://www.trajtracker.com/apiref/events/events_overview>`_ and check out
+the :func:`EventManager.register_operation <trajtracker:trajtracker.events.EventManager.register_operation>` method.
+
+*TrajTracker Paradigms* supports the following events per trial:
+
+- **trajtracker.events.TRIAL_INITIALIZED**: Dispatched when the trial information is initalized. This typically happens
+  right after the previous trial has ended.
+
+- **trajtracker.events.TRIAL_STARTED**: Dispatched when the trial starts, which is when the finger touches the screen.
+
+  when :attr:`Config.stimulus_then_move <trajtrackerp.num2pos.Config.stimulus_then_move>` = *True*,
+  the timing of target onset/offset is specified relatively to this event.
+
+- **trajtracker.events.TRIAL_SUCCEEDED**: Dispatched when the trial ends successfully. If the trial required an additional task
+  after the main task (e.g., confidence rating), the event will be dispatched after the additional tasks
+  are completed too.
+
+- **trajtracker.events.TRIAL_FAILED**: Dispatched when an error occurs. "An error" does not mean an incorrect response,
+  but that the subject did not comply with one of the experiment rules (e.g. lifted the finger, moved too slowly,
+  etc.).
+
+- **trajtracker.events.TRIAL_ENDED**: This event dispatched both with TRIAL_SUCCEEDED and with TRIAL_FAILED.
+
+- **trajtrackerp.common.FINGER_STARTED_MOVING**: Dispatched when the finger leaves the start point.
+
+  when :attr:`Config.stimulus_then_move <trajtrackerp.num2pos.Config.stimulus_then_move>` = *False*,
+  the timing of target onset/offset is specified relatively to this event.
+
+  In such case, if you set the target's onset_time to be 0, it will be presented right after this event.
+  The delay between the event and the target onset may vary within the range of 1 frame (delay <= 17 ms for
+  a 60Hz monitor). If you want to write a custom function that is very accurately syhcoronized with the
+  target's onset, it is better to register the function to FINGER_STARTED_MOVING with delay.
+  For example, registering your function to FINGER_STARTED_MOVING+0.1 will make it run 100 ms after the target's onset,
+  and registering it to FINGER_STARTED_MOVING+0.001 will make your function run in the frame immediately following
+  the target's onset.
+
 
 Resource files
 ++++++++++++++
