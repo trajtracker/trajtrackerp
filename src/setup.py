@@ -6,7 +6,7 @@ data_files = [(dir_name, [dir_name + "/" + filename for filename in listdir(dir_
 
 
 setup(name='trajtrackerp',
-      version='0.1.0',
+      version='1.0.0',
       description='Trajectory-tracking experiment scripts',
       url='http://trajtracker.com',
       author='Dror Dotan',
@@ -15,7 +15,7 @@ setup(name='trajtrackerp',
       packages=find_packages(),
       install_requires=['trajtracker'],
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 4 - Beta',
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering',
           'Programming Language :: Python :: 2.7',
