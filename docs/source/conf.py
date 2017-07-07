@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TrajTracker Paradigms'
-copyright = u'2017, Dror Dotan'
+copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | <a href="https://trajtracker.wixsite.com/trajtracker">Home</a>'
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -111,6 +111,11 @@ html_sidebars = {
     ]
 }
 
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = False
+
+# If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
+html_show_sphinx = False
 
 # -- Options for HTMLHelp output ------------------------------------------
 

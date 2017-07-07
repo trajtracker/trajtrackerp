@@ -34,7 +34,7 @@ This paradigm shows a number line and various possible stimuli. The response is 
 dragging the finger to a location on the number line.
 
 For an overview of this paradigm under TrajTracker, see
-`the number-to-position page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
+`the number-to-position page <https://trajtracker.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
 
 .. toctree::
    :maxdepth: 1
@@ -51,9 +51,6 @@ Discrete choice
 
 This paradigm shows two response buttons (in the top corners of the screen) and various possible stimuli.
 The response is indicated by dragging the finger to one of the buttons.
-
-For an overview of this paradigm under TrajTracker, see
-`the discrete-choice page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-dchoice>`_.
 
 .. toctree::
    :maxdepth: 1
