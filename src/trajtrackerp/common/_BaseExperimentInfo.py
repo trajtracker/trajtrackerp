@@ -116,7 +116,9 @@ class BaseExperimentInfo(object):
         """
         A list of all objects that need to know about the finger movement 
         (e.g. :class:`~trajtracker.movement.TrajectoryTracker` and the validators).
-        For each of these objects, obj.update_xyt() will be called on each frame.
+        For each of these objects, obj.reset(0) will be called when the trial is initialized (finger
+        touches screen) and obj.update_xyt(position, time_in_trial, time_in_session) will be called on each frame
+        when the finger moves (between the FINGER_STARTED_MOVING and FINGER_STOPPED_MOVING events).
         """
         return self._trajectory_sensitive_objects
 

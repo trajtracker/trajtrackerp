@@ -1,10 +1,17 @@
 """
 
-A simple version of the number-to-position experiment, which adds various customizations: 
-- Add functions that run when various events occur (e.g. finger stars moving) and do stuff.
-  In this example, the functions only print things. But you can use similar functions to do 
-  anything you want.
-- Create a new object that gets updated about the movement trajectory.  
+A simple version of the number-to-position experiment, which adds an object that is continuously fed
+with the finger trajectory information.
+
+To create such an object, you should:
+1. Create a class with the reset() and update_xyt() methods, each getting the same parameters
+   as in the example below.
+2. Create an object of this class and register it as a trajectory-sensitive object:
+   exp_info.add_trajectory_sensitive_object(tso)
+   
+reset() will be called when the trial is initialized (finger touches screen).
+update_xyt() will be repeatedly called when the finger moves (between the FINGER_STARTED_MOVING 
+and FINGER_STOPPED_MOVING events). 
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan

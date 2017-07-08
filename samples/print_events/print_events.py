@@ -1,10 +1,19 @@
 """
 
-A simple version of the number-to-position experiment, which adds various customizations: 
-- Add functions that run when various events occur (e.g. finger stars moving) and do stuff.
-  In this example, the functions only print things. But you can use similar functions to do 
-  anything you want.
-- Create a new object that gets updated about the movement trajectory.  
+A simple version of the number-to-position experiment, which demonstrates how to use the events mechanism: 
+it adds functions that run when various events occur (e.g. finger stars moving).
+In this example, the functions only print things to log and display the event on screen; 
+but you can use similar functions to do anything you want.
+
+The functions are hooked into the program by registering them to specific events within the trial
+(via the event manager). Here, the functions are registered to run immediately when the event occur. 
+To make them run in certain delay after the event, add the delay (in seconds) to the event itself.
+For example, try changing the registration of TRIAL_ENDED into:
+
+exp_info.event_manager.register_operation(event=ttrk.events.TRIAL_ENDED + 0.5,
+                                          operation=on_trial_ended,
+                                          recurring=True,
+                                          description="Custom on-ended operation")
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
