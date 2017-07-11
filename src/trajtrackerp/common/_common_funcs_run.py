@@ -532,7 +532,8 @@ def save_session_file(exp_info, paradigm):
 
     #-- Software version
     source_node = ET.SubElement(root, "source")
-    ET.SubElement(source_node, "software", name="TrajTracker", version=ttrk.version())
+    ver = ttrk.version()
+    ET.SubElement(source_node, "software", name="TrajTracker", version="{:}.{:}.{:}".format(ver[0], ver[1], ver[2]))
     ET.SubElement(source_node, "paradigm", name=paradigm)
     ET.SubElement(source_node, "experiment", name=exp_info.config.experiment_id)
 

@@ -1,0 +1,6 @@
+Version 1.1
+===========
+
+- Optionally allow short finger-off-screen periods during a trial (config.max_offscreen_duration)
+- Changed distribution to wheel
+

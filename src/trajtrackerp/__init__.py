@@ -26,7 +26,7 @@ def version():
     Returns the package version
     :return: tuple with 3 items: #major, #minor, #bugfix
     """
-    return 1, 1, 0
+    return 1, 1, 1
 
 
 from ._res import resources_dir, sounds_dir, images_dir
