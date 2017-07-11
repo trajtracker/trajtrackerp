@@ -52,6 +52,7 @@ class BaseConfig(object):
                  speed_guide_enabled, min_inst_speed,
                  grace_period, max_zigzags, save_results, sounds_dir,
                  finger_must_start_upwards,
+                 max_offscreen_duration,
                  stimulus_then_move, finger_moves_min_time, finger_moves_max_time,
                  confidence_rating,
 
@@ -154,6 +155,8 @@ class BaseConfig(object):
 
         # Whether to save the results (trials and trajectory)
         self.save_results = save_results
+
+        self.max_offscreen_duration = max_offscreen_duration
 
         #--------------------------------------------------------------------
         #    Advanced configuration

@@ -45,10 +45,68 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded SucceededAndProceed Failed Ab
 
 
 #----------------------------------------------------------------
+def run_trials(exp_info, run_one_trial_func, trial_info_class):
+    """
+    Default implementation of the experiment
+
+    :type exp_info: trajtrackerp.common.BaseExperimentInfo
+    :param run_one_trial_func: The run_trial() function of the relevant paradigm
+    :param trial_info_class: The TrialInfo class of the relevant paradigm
+    """
+
+    init_experiment(exp_info)
+
+    trial_num = 1
+
+    next_trial_already_initiated = False
+
+    while len(exp_info.trials) > 0:
+
+        trial_config = exp_info.trials.pop(0)
+
+        ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
+
+        # noinspection PyUnresolvedReferences
+        run_trial_rc = run_one_trial_func(exp_info, trial_info_class(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
+        next_trial_already_initiated = False
+        if run_trial_rc == RunTrialResult.Aborted:
+            print("   Trial aborted.")
+            exp_info.return_unused_trial_to_pool(trial_config)
+            continue
+
+        trial_num += 1
+
+        exp_info.exp_data['nTrialsCompleted'] += 1
+
+        if run_trial_rc == RunTrialResult.Succeeded:
+
+            exp_info.exp_data['nTrialsSucceeded'] += 1
+
+        elif run_trial_rc == RunTrialResult.SucceededAndProceed:
+
+            exp_info.exp_data['nTrialsSucceeded'] += 1
+            next_trial_already_initiated = True
+
+        elif run_trial_rc == RunTrialResult.Failed:
+
+            exp_info.exp_data['nTrialsFailed'] += 1
+            exp_info.return_unused_trial_to_pool(trial_config)
+
+        else:
+            raise Exception("Invalid result from run_trial(): {:}".format(run_trial_rc))
+
+
+#----------------------------------------------------------------
 def init_experiment(exp_info):
+    """
+    Initialize the experiment environment
+
+    :type exp_info: trajtrackerp.common.BaseExperimentInfo
+    """
 
     exp_info.session_start_localtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
+    # noinspection PyUnresolvedReferences
     if exp_info.config.shuffle_trials:
         random.shuffle(exp_info.trials)
 
@@ -78,7 +136,7 @@ def on_finger_touched_screen(exp_info, trial):
     trial.start_time = u.get_time()
 
     #-- Reset all trajectory-sensitive objects
-    for obj in exp_info.trajectory_sensitive_objects:
+    for obj in exp_info.trajectory_sensitive_objects + exp_info.touch_sensitive_objects:
         obj.reset(0)
 
 
@@ -210,7 +268,7 @@ def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=
 
 
 def format_coord_to_csv(coord_list):
-    return ";".join( ["{:}:{:}".format(c[0], c[1]) for c in coord_list] )
+    return ";".join(["{:}:{:}".format(c[0], c[1]) for c in coord_list])
 
 
 # ----------------------------------------------------------------
@@ -332,7 +390,7 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
     if len(coord) < n_stim:
         raise Exception(
             "Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
-                attr_name, exp_info.config.data_source, len(value), n_stim))
+                csv_col, exp_info.config.data_source, len(coord), n_stim))
 
     pos = target_holder.position
     if not isinstance(pos, list):
@@ -442,13 +500,22 @@ def update_movement_in_traj_sensitive_objects(exp_info, trial):
     """
 
     curr_time = u.get_time()
+    clicked = ttrk.env.mouse.check_button_pressed(0)
+    position = ttrk.env.mouse.position
+
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
 
-    for obj in exp_info.trajectory_sensitive_objects:
-        err = obj.update_xyt(ttrk.env.mouse.position, time_in_trial, time_in_session)
+    for obj in exp_info.touch_sensitive_objects:
+        err = obj.update_touching(clicked, time_in_trial, time_in_session)
         if err is not None:
             return err
+
+    if clicked:
+        for obj in exp_info.trajectory_sensitive_objects:
+            err = obj.update_xyt(position, time_in_trial, time_in_session)
+            if err is not None:
+                return err
 
     exp_info.event_manager.on_frame(time_in_trial, time_in_session)
 

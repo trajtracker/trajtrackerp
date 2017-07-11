@@ -55,6 +55,7 @@ from ._common_funcs_run import \
     on_response_made, \
     open_trials_file, \
     prepare_trial_out_row, \
+    run_trials, \
     run_post_trial_operations, \
     save_session_file, \
     trial_failed_common, \

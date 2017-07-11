@@ -38,43 +38,7 @@ from trajtrackerp.num2pos import ExperimentInfo, TrialInfo, create_experiment_ob
 
 #----------------------------------------------------------------
 def run_trials(exp_info):
-
-    common.init_experiment(exp_info)
-
-    trial_num = 1
-
-    next_trial_already_initiated = False
-
-    while len(exp_info.trials) > 0:
-
-        trial_config = exp_info.trials.pop(0)
-
-        ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
-
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
-        next_trial_already_initiated = False
-        if run_trial_rc == RunTrialResult.Aborted:
-            print("   Trial aborted.")
-            continue
-
-        trial_num += 1
-
-        exp_info.exp_data['nTrialsCompleted'] += 1
-
-        if run_trial_rc in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
-
-            exp_info.exp_data['nTrialsSucceeded'] += 1
-            next_trial_already_initiated = (run_trial_rc == RunTrialResult.SucceededAndProceed)
-
-        elif run_trial_rc == RunTrialResult.Failed:
-
-            exp_info.exp_data['nTrialsFailed'] += 1
-            exp_info.trials.append(trial_config)
-            if exp_info.config.shuffle_trials:
-                random.shuffle(exp_info.trials)
-
-        else:
-            raise Exception("Invalid result from run_trial(): {:}".format(run_trial_rc))
+    return common.run_trials(exp_info, run_trial, TrialInfo)
 
 
 #----------------------------------------------------------------
@@ -114,11 +78,6 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
         curr_time = u.get_time()
 
-        #-- Validate that finger still touches the screen
-        if not ttrk.env.mouse.check_button_pressed(0):
-            trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
-            return RunTrialResult.Failed
-
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
         err = common.update_movement_in_traj_sensitive_objects(exp_info, trial)
         if err is not None:
@@ -130,7 +89,7 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
             common.on_response_made(exp_info, trial, curr_time)
 
-            #-- Validate that the response wasn't too far
+            #-- Validate that the response wasn't too far off the number line's ends
             max_excess = exp_info.config.max_response_excess
             if max_excess is not None and (nl.response_value < nl.min_value or nl.response_value > nl.max_value):
                 excess = (nl.min_value - nl.response_value) if (nl.response_value < nl.min_value) \

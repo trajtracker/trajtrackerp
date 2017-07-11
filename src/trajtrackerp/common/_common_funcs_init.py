@@ -182,6 +182,11 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
     config = exp_info.config
 
+    v = ttrk.validators.FingerLiftedValidator(max_offscreen_duration=config.max_offscreen_duration)
+    v.enable_event = FINGER_STARTED_MOVING
+    v.disable_event = FINGER_STOPPED_MOVING
+    exp_info.add_touch_sensitive_object(v)
+
     if direction_validator:
         v = ttrk.validators.MovementAngleValidator(
             min_angle=config.dir_validator_min_angle,

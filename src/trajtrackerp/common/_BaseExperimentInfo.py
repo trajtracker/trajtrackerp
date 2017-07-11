@@ -20,11 +20,9 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import expyriment as xpy
+import random
 
 import trajtracker as ttrk
-# noinspection PyProtectedMember
-import trajtracker._utils as _u
 
 
 class BaseExperimentInfo(object):
@@ -53,6 +51,7 @@ class BaseExperimentInfo(object):
         self._errmsg_box = None
         self._trajtracker = None
         self._trajectory_sensitive_objects = []
+        self._touch_sensitive_objects = []
         self._event_sensitive_objects = []
 
         #: A :class:`~trajtracker.stimuli.StimulusContainer` object, containing all stimuli.
@@ -109,6 +108,19 @@ class BaseExperimentInfo(object):
         #: A :class:`~trajtracker.stimuli.Slider` for measuing subjective confidence rating
         self.confidence_slider = None
 
+    #---------------------------------------------------------------
+    def return_unused_trial_to_pool(self, trial):
+        """
+        If a trial was not completed for any reason (e.g., failed, aborted), use this function to return it
+        to the pool of trials.
+
+        :param trial: The trial object (previously popped from exp_info.trials)
+        """
+
+        self.trials.append(trial)
+        # noinspection PyUnresolvedReferences
+        if self.config.shuffle_trials:
+            random.shuffle(self.trials)
 
     #---------------------------------------------------------------
     @property
@@ -122,13 +134,19 @@ class BaseExperimentInfo(object):
         """
         return self._trajectory_sensitive_objects
 
-
     def add_trajectory_sensitive_object(self, obj):
         """
         Add an object to :attr:`~trajtrackerp.num2pos.trajectory_sensitive_objects`
         """
         self._trajectory_sensitive_objects.append(obj)
 
+    #---------------------------------------------------------------
+    @property
+    def touch_sensitive_objects(self):
+        return self._touch_sensitive_objects
+
+    def add_touch_sensitive_object(self, obj):
+        self._touch_sensitive_objects.append(obj)
 
     #---------------------------------------------------------------
     @property

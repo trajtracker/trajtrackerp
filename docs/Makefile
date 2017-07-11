@@ -22,3 +22,7 @@ preprocess:
 %: Makefile
 html: preprocess
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+clean:
+	rm -rf $(BUILDDIR)/*
+

@@ -21,6 +21,14 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+def version():
+    """
+    Returns the package version
+    :return: tuple with 3 items: #major, #minor, #bugfix
+    """
+    return 1, 1, 0
+
+
 from ._res import resources_dir, sounds_dir, images_dir
 
 import trajtrackerp.common

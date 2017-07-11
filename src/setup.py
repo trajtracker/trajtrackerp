@@ -1,12 +1,14 @@
 from setuptools import setup, find_packages
 from os import listdir
+import trajtrackerp
 
 res_directories = 'res/images', 'res/sounds'
 data_files = [(dir_name, [dir_name + "/" + filename for filename in listdir(dir_name)]) for dir_name in res_directories]
 
+ver = trajtrackerp.version()
 
 setup(name='trajtrackerp',
-      version='1.0.0',
+      version='{:}.{:}.{:}'.format(ver[0], ver[1], ver[2]),
       description='Trajectory-tracking experiment scripts',
       url='http://trajtracker.com',
       author='Dror Dotan',

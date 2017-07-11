@@ -38,45 +38,7 @@ from trajtrackerp.dchoice import TrialInfo, hide_feedback_stimuli
 
 #----------------------------------------------------------------
 def run_trials(exp_info):
-
-    common.init_experiment(exp_info)
-
-    trial_num = 1
-
-    next_trial_already_initiated = False
-
-    while len(exp_info.trials) > 0:
-
-        trial_config = exp_info.trials[0]
-
-        ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
-
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
-        next_trial_already_initiated = False
-        if run_trial_rc == RunTrialResult.Aborted:
-            print("   Trial aborted.")
-            continue
-
-        trial_num += 1
-
-        exp_info.exp_data['nTrialsCompleted'] += 1
-
-        if run_trial_rc in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
-
-            exp_info.exp_data['nTrialsSucceeded'] += 1
-            next_trial_already_initiated = (run_trial_rc == RunTrialResult.SucceededAndProceed)
-
-        elif run_trial_rc == RunTrialResult.Failed:
-
-            exp_info.exp_data['nTrialsFailed'] += 1
-            exp_info.trials.append(trial_config)
-            if exp_info.config.shuffle_trials:
-                random.shuffle(exp_info.trials)
-
-        else:
-            raise Exception("Invalid result from run_trial(): {:}".format(run_trial_rc))
-
-        exp_info.trials.pop(0)
+    return common.run_trials(exp_info, run_trial, TrialInfo)
 
 
 #----------------------------------------------------------------
