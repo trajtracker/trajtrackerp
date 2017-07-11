@@ -3,3 +3,6 @@ docs/build
 samples/**/data
 samples/**/events
 docs/source/dchoice/Config_common.txt
+src/dist
+src/trajtrackerp.egg-info
+src/build
