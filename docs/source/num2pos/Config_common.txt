@@ -245,48 +245,6 @@ Fixation stimulus
     X position the "start" rectangle
 
 
-Subjective confidence rating
-----------------------------
-
-This feature will show, after each trial, a slider with which the subjects will rate their confidence.
-
-.. autoinstanceattribute:: Config.confidence_rating
-    :annotation: = False (bool)
-
-    Whether to ask for such confidence rating after each trial
-
-.. autoinstanceattribute:: Config.confidence_slider_height
-    :annotation: = 0.7 in num2pos paradigm, or 0.8 in discrete-choice paradigm
-
-    The slider's height.
-    Either height in pixels (int) or percentage of the screen height (a value between 0 and 1)
-
-.. autoinstanceattribute:: Config.confidence_slider_y
-    :annotation: = -0.05 in num2pos paradigm, or 0 in discrete-choice paradigm
-
-    The slider's vertical position (horizontal position = middle).
-    Either position in pixels (int) or percentage of the screen height (a value between -0.5 and 0.5)
-
-
-Error-message text box
-----------------------
-
-.. autoinstanceattribute:: Config.errmsg_textbox_coords
-    :annotation: = (0, 0)  (tuple x, y)
-
-.. autoinstanceattribute:: Config.errmsg_textbox_size
-    :annotation: = (290, 180)  (tuple width, height)
-
-.. autoinstanceattribute:: Config.errmsg_textbox_font_size
-    :annotation: = 16 (int)
-
-.. autoinstanceattribute:: Config.errmsg_textbox_font_name
-    :annotation: = 'Arial' (str)
-
-.. autoinstanceattribute:: Config.errmsg_textbox_font_colour
-    :annotation: = Red (RGB color)
-
-
 Movement restrictions (validators)
 ----------------------------------
 
@@ -374,3 +332,63 @@ Movement restrictions (validators)
     :annotation: = 10 (int)
 
     See :attr:`NCurvesValidator.min_angle_change_per_curve <trajtracker:trajtracker.validators.NCurvesValidator.min_angle_change_per_curve>`
+
+
+Finger trajectory tracking
+--------------------------
+
+.. autoinstanceattribute:: Config.max_post_response_record_duration
+    :annotation: = 0.3 seconds (Number)
+
+    Defines how long to keep recording the finger trajectory after a response was made.
+
+    By default, any of the following will stop trajectory recording:
+
+    - A response was made: keep recording for *max_post_response_record_duration* seconds.
+    - The finger was lifted from screen
+    - An error occurred in the trial
+
+    **Note**: Changing :attr:`TrajectoryTracker.disable_events <trajtracker:trajtracker.movement.TrajectoryTracker.disable_events>`
+    will override this default behavior. The *max_post_response_record_duration* parameter will be ignored in this case.
+
+
+Subjective confidence rating
+----------------------------
+
+This feature will show, after each trial, a slider with which the subjects will rate their confidence.
+
+.. autoinstanceattribute:: Config.confidence_rating
+    :annotation: = False (bool)
+
+    Whether to ask for such confidence rating after each trial
+
+.. autoinstanceattribute:: Config.confidence_slider_height
+    :annotation: = 0.7 in num2pos paradigm, or 0.8 in discrete-choice paradigm
+
+    The slider's height.
+    Either height in pixels (int) or percentage of the screen height (a value between 0 and 1)
+
+.. autoinstanceattribute:: Config.confidence_slider_y
+    :annotation: = -0.05 in num2pos paradigm, or 0 in discrete-choice paradigm
+
+    The slider's vertical position (horizontal position = middle).
+    Either position in pixels (int) or percentage of the screen height (a value between -0.5 and 0.5)
+
+
+Error-message text box
+----------------------
+
+.. autoinstanceattribute:: Config.errmsg_textbox_coords
+    :annotation: = (0, 0)  (tuple x, y)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_size
+    :annotation: = (290, 180)  (tuple width, height)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_size
+    :annotation: = 16 (int)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_name
+    :annotation: = 'Arial' (str)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_colour
+    :annotation: = Red (RGB color)

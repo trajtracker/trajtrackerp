@@ -35,6 +35,13 @@ class BaseTrialInfo(object):
         #: The time when the trial started
         self.start_time = None
 
+        #: The duration (in seconds) from the trial start (touching the screen) until its end
+        #: (including the time taken for post-trial operations such as subjective confidence rating)
+        self.duration = None
+
+        #: The time within the trial (in seconds) when finger was lifted from screen in a valid manner
+        self.time_finger_lifted = None
+
         #: results collected during the experiment (dict)
         self.results = {}
 

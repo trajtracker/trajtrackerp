@@ -23,15 +23,12 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import division
 
 import expyriment as xpy
-import numpy as np
-import random
 
 import trajtracker as ttrk
 import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
-from trajtracker.movement import StartPoint
 from trajtrackerp import common
-from trajtrackerp.common import RunTrialResult, FINGER_STARTED_MOVING
+from trajtrackerp.common import RunTrialResult, FINGER_LIFTED
 
 from trajtrackerp.dchoice import TrialInfo, hide_feedback_stimuli
 
@@ -57,6 +54,8 @@ def run_trial(exp_info, trial, trial_already_initiated):
     :return: RunTrialResult
     """
 
+    config = exp_info.config
+
     initialize_trial(exp_info, trial)
 
     if trial_already_initiated:
@@ -78,14 +77,11 @@ def run_trial(exp_info, trial, trial_already_initiated):
             trial_failed(rc[1], exp_info, trial)
         return rc[0]
 
+    time_response_made = None
+
     while True:  # This loop runs once per frame
 
         curr_time = u.get_time()
-
-        if not ttrk.env.mouse.check_button_pressed(0):
-            trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"),
-                         exp_info, trial)
-            return RunTrialResult.Failed
 
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
         err = common.update_movement_in_traj_sensitive_objects(exp_info, trial)
@@ -95,8 +91,9 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
         #-- Check if a response button was reached
         user_response = get_touched_button(exp_info)
-        if user_response is not None:
+        if user_response is not None and time_response_made is None:
 
+            time_response_made = curr_time
             common.on_response_made(exp_info, trial, curr_time)
 
             min_movement_time = trial.csv_data['min_movement_time'] if ('min_movement_time' in trial.csv_data) else exp_info.config.min_movement_time
@@ -109,12 +106,21 @@ def run_trial(exp_info, trial, trial_already_initiated):
             exp_info.sounds_ok[0].play()
             trial.stopped_moving_event_dispatched = True
 
-            #-- Optionally, run additional stages
-            run_trial_result = common.run_post_trial_operations(exp_info, trial)
-            if run_trial_result in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
-                trial_succeeded(exp_info, trial, user_response)
+        #-- Successful end-of-trial conditions
+        if time_response_made is not None:
 
-            return run_trial_result
+            time_in_trial = curr_time - trial.start_time
+
+            if not ttrk.env.mouse.check_button_pressed(0):
+                #-- Finger was lifted
+                trial.time_finger_lifted = time_in_trial
+                exp_info.event_manager.dispatch_event(FINGER_LIFTED, time_in_trial,
+                                                      curr_time - exp_info.session_start_time)
+                break
+
+            if curr_time > time_response_made + config.max_post_response_record_duration:
+                #-- post-response duration has expired
+                break
 
         xpy.io.Keyboard.process_control_keys()
 
@@ -122,6 +128,15 @@ def run_trial(exp_info, trial, trial_already_initiated):
         #-- This is done when the loop ends, not when it starts, because there was another present()
         #-- call just before the loop, inside wait_until_finger_moves()
         exp_info.stimuli.present()
+
+    #-- Main task ended successfully
+
+    #-- Optionally, run additional stages
+    run_trial_result = common.run_post_trial_operations(exp_info, trial)
+    if run_trial_result in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
+        trial_succeeded(exp_info, trial, user_response)
+
+    return run_trial_result
 
 
 #----------------------------------------------------------------
@@ -200,12 +215,7 @@ def trial_succeeded(exp_info, trial, user_response):
     :param user_response: The button selected by the user (0=left, 1=right) 
     """
 
-    print("   Trial ended successfully.")
-
-    curr_time = u.get_time()
-    time_in_trial = curr_time - trial.start_time
-    time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
+    common.trial_succeeded_common(exp_info, trial)
 
     show_feedback(exp_info, trial, user_response)
 

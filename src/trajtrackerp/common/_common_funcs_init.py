@@ -34,7 +34,7 @@ import trajtrackerp as ttrkp
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
-from trajtrackerp.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
+from trajtrackerp.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, FINGER_LIFTED, RESPONSE_MADE
 
 
 #---------------------------------------------------------------------
@@ -148,8 +148,8 @@ def create_traj_tracker(exp_info):
 
     traj_file_path = xpy.io.defaults.datafile_directory + "/" + exp_info.traj_out_filename
     exp_info.trajtracker = ttrk.movement.TrajectoryTracker(traj_file_path)
-    exp_info.trajtracker.enable_event = FINGER_STARTED_MOVING
-    exp_info.trajtracker.disable_event = FINGER_STOPPED_MOVING
+    exp_info.trajtracker.enable_events = ttrk.events.TRIAL_STARTED,
+    exp_info.trajtracker.disable_events = ttrk.events.TRIAL_ENDED, FINGER_LIFTED, RESPONSE_MADE + exp_info.config.max_post_response_record_duration
 
 
 #----------------------------------------------------------------
@@ -183,19 +183,19 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
     config = exp_info.config
 
     v = ttrk.validators.FingerLiftedValidator(max_offscreen_duration=config.max_offscreen_duration)
-    v.enable_event = FINGER_STARTED_MOVING
-    v.disable_event = FINGER_STOPPED_MOVING
+    v.enable_events = FINGER_STARTED_MOVING,
+    v.disable_events = FINGER_STOPPED_MOVING,
     exp_info.add_touch_sensitive_object(v)
+    exp_info.add_event_sensitive_object(v)
 
     if direction_validator:
         v = ttrk.validators.MovementAngleValidator(
             min_angle=config.dir_validator_min_angle,
             max_angle=config.dir_validator_max_angle,
             calc_angle_interval=config.dir_validator_calc_angle_interval)
-        v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = FINGER_STOPPED_MOVING
+        v.enable_events = FINGER_STARTED_MOVING,
+        v.disable_events = FINGER_STOPPED_MOVING,
         exp_info.add_validator(v, 'direction')
-
 
     if global_speed_validator:
         v = ttrk.validators.GlobalSpeedValidator(
@@ -206,27 +206,25 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             milestones=config.global_speed_validator_milestones,
             show_guide=config.speed_guide_enabled)
         v.do_present_guide = False
-        v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = FINGER_STOPPED_MOVING
+        v.enable_events = FINGER_STARTED_MOVING,
+        v.disable_events = FINGER_STOPPED_MOVING,
         exp_info.add_validator(v, 'global_speed')
         exp_info.stimuli.add(v.guide.stimulus, "speed_guide", visible=False)
-
 
     if inst_speed_validator:
         v = ttrk.validators.InstantaneousSpeedValidator(
             min_speed=config.min_inst_speed,
             grace_period=config.grace_period,
             calculation_interval=0.05)
-        v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = FINGER_STOPPED_MOVING
+        v.enable_events = FINGER_STARTED_MOVING,
+        v.disable_events = FINGER_STOPPED_MOVING,
         exp_info.add_validator(v, 'inst_speed')
-
 
     if zigzag_validator:
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
         v.direction_monitor.min_angle_change_per_curve = config.zigzag_validator_min_angle_change_per_curve
-        v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = FINGER_STOPPED_MOVING
+        v.enable_events = FINGER_STARTED_MOVING,
+        v.disable_events = FINGER_STOPPED_MOVING,
         exp_info.add_validator(v, 'zigzag')
 
 
@@ -404,6 +402,7 @@ def create_fixation(exp_info):
                                                   recurring=True,
                                                   description="Hide fixation")
 
+
 #----------------------------------------------------------------
 def show_fixation(exp_info, visible=True):
 
@@ -572,7 +571,7 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
                                  format(param_name, param_value))
 
     elif param_type == ttrk.TYPE_CALLABLE:
-        if "__call__" not in dir(value):
+        if "__call__" not in dir(param_value):
             raise ttrk.TypeError(
                 "config.{:} was set to a non-callable value ({:})".format(param_name, param_value))
 

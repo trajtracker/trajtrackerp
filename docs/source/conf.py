@@ -50,7 +50,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TrajTracker Paradigms'
-copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | <a href="https://trajtracker.wixsite.com/trajtracker">Home</a>'
+copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | ' + \
+            u'<a href="https://trajtracker.wixsite.com/trajtracker">Home</a> | ' +\
+            u'TrajTracker Paradigms {:}'.format(trajtrackerp.version_str())
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -94,6 +96,12 @@ html_theme = 'alabaster'
 # documentation.
 #
 # html_theme_options = {}
+html_theme_options = {
+#    'logo': 'logo.png',
+#    'github_user': 'trajtracker',
+#    'github_repo': 'trajtrackerp',
+    'show_powered_by' : False,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -120,6 +128,8 @@ html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
+
+show_powered_by = False
 
 # -- Options for HTMLHelp output ------------------------------------------
 

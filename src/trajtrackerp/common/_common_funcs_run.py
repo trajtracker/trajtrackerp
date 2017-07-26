@@ -181,16 +181,21 @@ def wait_until_finger_moves(exp_info, trial):
         # noinspection PyUnusedLocal
         def on_loop_callback(time_in_trial, time_in_session):
             exp_info.fixation.update_xyt(time_in_session=time_in_session)
+            return update_movement_in_traj_sensitive_objects(exp_info, trial, False)
     else:
-        on_loop_callback = None
+        # noinspection PyUnusedLocal
+        def on_loop_callback(time_in_trial, time_in_session):
+            return update_movement_in_traj_sensitive_objects(exp_info, trial, False)
 
-    exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
-                                         on_loop_present=exp_info.stimuli,
-                                         on_loop_callback=on_loop_callback,
-                                         event_manager=exp_info.event_manager,
-                                         trial_start_time=trial.start_time,
-                                         session_start_time=exp_info.session_start_time,
-                                         max_wait_time=trial.finger_moves_max_time)
+    err = exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
+                                               on_loop_present=exp_info.stimuli,
+                                               on_loop_callback=on_loop_callback,
+                                               event_manager=exp_info.event_manager,
+                                               trial_start_time=trial.start_time,
+                                               session_start_time=exp_info.session_start_time,
+                                               max_wait_time=trial.finger_moves_max_time)
+    if err is not None:
+        return RunTrialResult.Failed, err
 
     if exp_info.start_point.state == StartPoint.State.aborted:
         #-- Finger lifted
@@ -437,6 +442,7 @@ def update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
     if coord_as_percentage:
         coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
 
+    # noinspection PyUnresolvedReferences
     visual_obj.position = (coord, visual_obj.position[1]) if is_x else (visual_obj.position[0], coord)
     return True
 
@@ -490,12 +496,15 @@ def coord_to_pixels(coord, col_name, filename, is_x):
 
 
 # ------------------------------------------------
-def update_movement_in_traj_sensitive_objects(exp_info, trial):
+def update_movement_in_traj_sensitive_objects(exp_info, trial, within_movement_time=True):
     """
     Update the trajectory-sensitive objects about the mouse/finger movement
 
     :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
     :type trial: trajtracker.paradigms.common.BaseTrialInfo
+    :param within_movement_time: Indicates whether the this is currently the finger's movement time
+                   (between start of detected movement and a response being made). The function may also be called
+                   outside this time interval.
     :return: None if all is OK; or an ExperimentError object if one of the validators issued an error
     """
 
@@ -505,6 +514,15 @@ def update_movement_in_traj_sensitive_objects(exp_info, trial):
 
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
+
+    if not within_movement_time:
+        #-- Only recording finger trajectory
+        err = exp_info.trajtracker.update_xyt(position, time_in_trial, time_in_session)
+        if err is not None:
+            return err
+        return None
+
+    #-- Invoke all trajectory/touch-sensitive objects
 
     for obj in exp_info.touch_sensitive_objects:
         err = obj.update_touching(clicked, time_in_trial, time_in_session)
@@ -609,20 +627,37 @@ def trial_failed_common(err, exp_info, trial):
 
     curr_time = u.get_time()
 
-    time_in_trial = curr_time - trial.start_time
+    trial.duration = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
 
     if not trial.stopped_moving_event_dispatched:
-        exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial, time_in_session)
+        exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, trial.duration, time_in_session)
         trial.stopped_moving_event_dispatched = True
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, trial.duration, time_in_session)
 
     exp_info.errmsg_textbox.unload()
     exp_info.errmsg_textbox.text = err.message
     exp_info.errmsg_textbox.visible = True
 
     exp_info.sound_err.play()
+
+
+#----------------------------------------------------------------
+def trial_succeeded_common(exp_info, trial):
+    """
+    Called when the trial succeeded
+
+    :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
+    """
+
+    ttrk.log_write("Trial ended successfully")
+
+    curr_time = u.get_time()
+    trial.duration = curr_time - trial.start_time
+    time_in_session = curr_time - exp_info.session_start_time
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, trial.duration, time_in_session)
 
 
 #----------------------------------------------------------------
@@ -644,6 +679,7 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
 
     t_move = -1 if (trial.time_started_moving is None) else trial.time_started_moving
     t_target = -1 if (trial.targets_t0 is None) else trial.targets_t0
+    t_lifted = trial.duration if (trial.time_finger_lifted is None) else trial.time_finger_lifted
 
     row = {
         'trialNum': trial.trial_num,
@@ -653,6 +689,7 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
         'movementTime': "{:.3g}".format(0 if (trial.movement_time is None) else trial.movement_time),
         'timeInSession': "{:.3g}".format(trial.start_time - exp_info.session_start_time),
         'timeUntilFingerMoved': "{:.3g}".format(t_move),
+        'timeUntilFingerLifted': "{:.3g}".format(t_lifted),
         'timeUntilTarget': "{:.3g}".format(t_target),
     }
 
@@ -673,7 +710,7 @@ def _get_trials_csv_out_common_fields(exp_info):
     additional_cols = sorted(list(set(additional_cols)))
 
     fields = ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
-              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget'] + additional_cols
+              'timeInSession', 'timeUntilFingerMoved', 'timeUntilFingerLifted', 'timeUntilTarget'] + additional_cols
 
     return fields
 

@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TrajTracker paradigms
-=====================
+TrajTracker Paradigms |version|
+===============================
 
 TrajTracker offers two ready-to-use experimental paradigms - number-to-position mapping and discrete-choice
 (two buttons forced choice). Each of them is a set of functions that allow

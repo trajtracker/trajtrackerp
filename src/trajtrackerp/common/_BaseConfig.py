@@ -20,7 +20,6 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from enum import Enum
 import expyriment as xpy
 import trajtracker as ttrk
 
@@ -32,6 +31,10 @@ FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 #-- This event is dispatched when the finger stops moving - either a response was made,
 #-- or the trial failed.
 FINGER_STOPPED_MOVING = ttrk.events.Event("FINGER_STOPPED_MOVING")
+
+#-- This event is dispatched when the finger was lifted from screen.
+#-- It is also dispatched when the trial ended for another reason
+FINGER_LIFTED = ttrk.events.Event("FINGER_LIFTED")
 
 #-- This event is dispatched when the participant responded for the main task (num2pos / decision)
 RESPONSE_MADE = ttrk.events.Event("RESPONSE_MADE")
@@ -62,7 +65,6 @@ class BaseConfig(object):
         #: A unique identifier of this experiment.
         #: This string is saved as-is to the results file, to identify the experiment.
         self.experiment_id = experiment_id
-
 
         #----- Configuration of source data & targets -----
 
@@ -129,10 +131,13 @@ class BaseConfig(object):
         # Colour of the "start" rectangle
         self.start_point_colour = start_point_colour
 
-
         #----- Configuration of sounds -----
 
         self.sounds_dir = sounds_dir
+
+        #----- Trajectory tracker -----
+
+        self.max_post_response_record_duration = 0.3
 
         #----- Configuration of validators -----
 
@@ -214,7 +219,6 @@ class BaseConfig(object):
         self.confidence_slider_height = 0.7
         self.confidence_slider_y = -0.05
         self.confidence_slider_picture = 'confidence_slider_grey.bmp'
-
 
     #---------------------------------------------------
     @property

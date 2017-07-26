@@ -23,10 +23,15 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 
 def version():
     """
-    Returns the package version
-    :return: tuple with 3 items: #major, #minor, #bugfix
+    Returns the package version as a tuple with 3 items: #major, #minor, #bugfix
     """
-    return 1, 1, 1
+    return 1, 2, 0
+
+
+def version_str():
+    """ Returns the package version as a string: major.minor.bugfix """
+    v = version()
+    return '{:}.{:}.{:}'.format(v[0], v[1], v[2])
 
 
 from ._res import resources_dir, sounds_dir, images_dir
