@@ -379,22 +379,33 @@ def create_fixation(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    fixtype = exp_info.config.fixation_type.lower()
+    #-- No fixation
+    if exp_info.config.fixation_type is None:
+        exp_info.fixation = None
 
-    if fixtype is None:
-        pass
-
-    if fixtype == 'cross':
-        create_fixation_cross(exp_info)
-
-    elif fixtype == 'text':
-        create_textbox_fixation(exp_info)
-
-    elif fixtype == 'zoom':
-        create_fixation_zoom(exp_info)
+    #-- A stimulus was provided as fixation
+    elif 'present' in dir(exp_info.config.fixation_type):
+        exp_info.fixation = exp_info.config.fixation_type
 
     else:
-        raise ttrk.ValueError("Invalid config.fixation_type ({:})".format(fixtype))
+        #-- Predefined fixation shapes
+
+        fixtype = exp_info.config.fixation_type.lower()
+
+        if fixtype == 'cross':
+            create_fixation_cross(exp_info)
+
+        elif fixtype == 'dot':
+            create_fixation_dot(exp_info)
+
+        elif fixtype == 'text':
+            create_textbox_fixation(exp_info)
+
+        elif fixtype == 'zoom':
+            create_fixation_zoom(exp_info)
+
+        else:
+            raise ttrk.ValueError("Invalid config.fixation_type ({:})".format(fixtype))
 
     if exp_info.config.hide_fixation_event is not None:
         exp_info.event_manager.register_operation(event=exp_info.config.hide_fixation_event,
@@ -417,6 +428,13 @@ def show_fixation(exp_info, visible=True):
 def create_fixation_cross(exp_info):
     y, height = exp_info.get_default_target_y()
     exp_info.fixation = xpy.stimuli.FixCross(size=(30, 30), position=(0, y), line_width=2)
+    exp_info.fixation.preload()
+
+
+#----------------------------------------------------------------
+def create_fixation_dot(exp_info):
+    y, height = exp_info.get_default_target_y()
+    exp_info.fixation = xpy.stimuli.Circle(radius=1, colour=xpy.misc.constants.C_WHITE, position=(0, y))
     exp_info.fixation.preload()
 
 

@@ -2,8 +2,6 @@ from setuptools import setup, find_packages
 from os import listdir
 import trajtrackerp
 
-res_directories = 'res/images', 'res/sounds'
-data_files = [(dir_name, [dir_name + "/" + filename for filename in listdir(dir_name)]) for dir_name in res_directories]
 
 ver = trajtrackerp.version()
 
@@ -23,5 +21,6 @@ setup(name='trajtrackerp',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.6'
       ],
-      data_files=data_files,
+      package_dir={'trajtrackerp': 'trajtrackerp'},
+      package_data={'trajtrackerp': ['../trajtrackerp_res/sounds/*', '../trajtrackerp_res/images/*']},
       zip_safe=False)

@@ -1,3 +1,11 @@
+Version 1.2
+===========
+- Record trajectory before t=0 (detectable movement) and for config.max_post_response_record_duration after making a response
+  (this is important to get reliable speed calculation also at the ends of the trajectory)
+- Added FINGER_LIFTED event
+- Recording and exporting trial.duration
+- Fixed the location of the resource directory: it's now called "trajtrackerp_res" and properly installed under site-packages
+
 Version 1.1
 ===========
 

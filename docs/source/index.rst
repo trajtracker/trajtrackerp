@@ -152,7 +152,8 @@ TrajTracker includes the source code for the two paradigms above, and also some 
 - Sounds (to indicate successful / incorrect trial)
 - Images for simple stimuli
 
-These files are in the `src/res <https://github.com/trajtracker/trajtracker/tree/master/src/res>`_ sub-directory.
+These files are in the `trajtrackerp_res <https://github.com/trajtracker/trajtrackerp/tree/master/src/trajtrackerp_res>`_
+directory (if your installed with *pip*, find this directory in your *site-packages* folder).
 
 
 Indices and tables

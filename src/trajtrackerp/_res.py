@@ -21,6 +21,6 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import trajtrackerp as ttrkp
 
-resources_dir = os.path.dirname(os.path.dirname(ttrkp.__file__)) + os.path.sep + "res"
+resources_dir = os.path.dirname(os.path.dirname(ttrkp.__file__)) + os.path.sep + "trajtrackerp_res"
 sounds_dir = resources_dir + os.path.sep + "sounds"
 images_dir = resources_dir + os.path.sep + "images"

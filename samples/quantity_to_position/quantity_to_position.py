@@ -135,7 +135,7 @@ exp_info = ttrkp.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 ttrkp.num2pos.create_experiment_objects(exp_info)
 exp_info.generic_target.available_stimuli = stimuli
 
-ttrkp.num2pos.register_to_event_manager(exp_info)
+ttrkp.common.register_to_event_manager(exp_info)
 ttrkp.num2pos.run_trials(exp_info)
 ttrkp.num2pos.save_session_file(exp_info)
 

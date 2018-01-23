@@ -137,10 +137,12 @@ Fixation stimulus
     This value can be overriden by column *fixation.text* in the CSV config file.
 
 .. autoinstanceattribute:: Config.fixation_type
-    :annotation: - 'cross' (default), 'text', 'zoom', or None
+    :annotation: - 'cross' (default), 'dot', 'text', 'zoom', or None
 
     The type of fixation stimulus.
-    When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
+
+    When using 'text' fixation, you can set the text via :attr:`~trajtrackerp.num2pos.Config.fixation_text`
+    or via the CSV config file.
 
 .. autoinstanceattribute:: Config.fixzoom_box_size
     :annotation: = (40, 40) (width, height)
