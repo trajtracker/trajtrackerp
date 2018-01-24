@@ -12,7 +12,7 @@ import expyriment as xpy
 
 import trajtracker as ttrk
 import trajtrackerp as ttrkp
-from trajtrackerp import num2pos
+from trajtrackerp import num2pos, common
 
 
 if not xpy.misc.is_android_running():
@@ -36,7 +36,7 @@ if not xpy.misc.is_android_running():
 (subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 #-- Run the experiment
-exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
+exp_info = num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 num2pos.create_experiment_objects(exp_info)
 common.register_to_event_manager(exp_info)
 num2pos.run_trials(exp_info)

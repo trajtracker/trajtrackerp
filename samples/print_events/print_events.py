@@ -19,8 +19,6 @@ exp_info.event_manager.register_operation(event=ttrk.events.TRIAL_ENDED + 0.5,
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
-import numpy as np
-
 import expyriment as xpy
 
 import trajtracker as ttrk

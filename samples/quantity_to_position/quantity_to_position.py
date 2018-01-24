@@ -8,7 +8,6 @@ during a trial.
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
-import numbers
 import numpy as np
 import random
 
@@ -56,6 +55,7 @@ config = num2pos.Config("Q2Pos(D+U)",
 #=================================================================================
 #  Functions for creating the visual stimuli - one dot cloud per target number
 #=================================================================================
+
 
 #----------------------------------------------------------------
 # Create stimuli: grey circle with dots in random positions
@@ -107,7 +107,7 @@ def get_random_pos(radius):
     x = int(r * np.cos(alpha))
     y = int(r * np.sin(alpha))
 
-    return (x,y)
+    return x, y
 
 
 #=================================================================================
@@ -116,14 +116,14 @@ def get_random_pos(radius):
 
 #-- Initialize Expyriment
 
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
 
-stimuli = create_stimuli(0, 100)
+stimulus_list = create_stimuli(0, 100)
 
 #-- Get subject info
 (subj_id, subj_name) = ttrkp.common.get_subject_name_id()
@@ -133,11 +133,11 @@ stimuli = create_stimuli(0, 100)
 
 exp_info = ttrkp.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 ttrkp.num2pos.create_experiment_objects(exp_info)
-exp_info.generic_target.available_stimuli = stimuli
+exp_info.generic_target.available_stimuli = stimulus_list
 
 ttrkp.common.register_to_event_manager(exp_info)
 ttrkp.num2pos.run_trials(exp_info)
-ttrkp.num2pos.save_session_file(exp_info)
+ttrkp.common.save_session_file(exp_info, "NL")
 
 #-- Shutdown Expyriment
 xpy.control.end()
