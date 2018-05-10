@@ -38,14 +38,17 @@ from trajtrackerp.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, FI
 
 
 #---------------------------------------------------------------------
-def get_subject_name_id():
+def get_subject_name_id(ask_for_name=True):
     """
     Get the name (optional) and the initials of the subject
     """
 
-    name_input = xpy.io.TextInput("Subject name - optional:", length=40,
-                                  message_colour=xpy.misc.constants.C_WHITE)
-    subj_name = name_input.get()
+    if ask_for_name:
+        name_input = xpy.io.TextInput("Subject name - optional:", length=40,
+                                      message_colour=xpy.misc.constants.C_WHITE)
+        subj_name = name_input.get()
+    else:
+        subj_name = ""
 
     if subj_name == "":
         default_id = ""
