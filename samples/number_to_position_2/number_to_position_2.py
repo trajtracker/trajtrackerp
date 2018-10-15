@@ -82,6 +82,8 @@ if not xpy.misc.is_android_running():
 exp_info = num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 num2pos.create_experiment_objects(exp_info)
 
+exp_info.numberline.position = 0.0, 0.0
+
 #-- Customize them
 if STIMULUS_THEN_MOVE:
     exp_info.text_target.onset_time = [0.5, 0.6]
