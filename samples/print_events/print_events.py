@@ -36,7 +36,7 @@ ttrk.env.default_log_level = ttrk.log_info
 config = num2pos.Config("Num2Pos(D+U)",
                         max_movement_time=2,
                         max_numberline_value=100,
-                        data_source=range(101) * 2,
+                        data_source=list(range(101)) * 2,
                         text_target_height=0.5)
 
 #=====================================================================
